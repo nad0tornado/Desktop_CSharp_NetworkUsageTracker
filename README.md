@@ -11,6 +11,6 @@ So I developed this app which will report on my network usage (up/down) within a
 Eventually I'll add a feature that let's me only have it notify me if I use a certain amount
 of data such as 10GB in 30 minutes (definitely something worth checking).
 
-If I know when my computer is using a lot of data, I can pause and investigate why.
+If I know when my computer is using a lot of data, I can pause and terminate any apps which are chewing through my data and save myself a ton of money and headache.
 
 Pretty neat huh?
