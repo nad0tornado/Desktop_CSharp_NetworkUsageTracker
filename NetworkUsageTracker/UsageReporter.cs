@@ -15,19 +15,33 @@ namespace NetworkUsageTracker
         public void ReportUsage()
         {
             var usageInfo = _usageAnalyzer.GetRelativeUsageInfo();
-            var bytesSentInfo = Utilities.ConvertBytes(usageInfo.BytesSent);
-            var bytesReceivedInfo = Utilities.ConvertBytes(usageInfo.BytesReceived);
+            var averageUsageInfo = _usageAnalyzer.GetAverageUsageInfo();
 
-            // .. Toast Notification
-            ToastContentBuilder builder = new ToastContentBuilder();
-            string toastMessage = "Hi Nathan! \n\nThere were " + bytesSentInfo + " sent and " + bytesReceivedInfo + " received";
-            builder.AddText("Network Usage Tracker").AddText(toastMessage).Show();
+            var bytesSent = Utilities.ConvertBytes(usageInfo.BytesSent);
+            var bytesReceived = Utilities.ConvertBytes(usageInfo.BytesReceived);
+            var avgBytesSent = Utilities.ConvertBytes(averageUsageInfo.BytesSent);
+            var avgBytesReceived = Utilities.ConvertBytes(averageUsageInfo.BytesReceived);
+
+            var bytesSentAboveAverage = Utilities.ConvertBytes(usageInfo.BytesSent - averageUsageInfo.BytesSent);
+            var bytesReceivedAboveAverage = Utilities.ConvertBytes(averageUsageInfo.BytesReceived - averageUsageInfo.BytesReceived);
+
+            // .. Only toast if the usage is above average
+            if (bytesSentAboveAverage.Value > 0 || bytesReceivedAboveAverage.Value > 0)
+            {
+                ToastContentBuilder builder = new ToastContentBuilder();
+
+                string toastMessage = "Hi Nathan! \n\n" +
+                    (bytesSentAboveAverage.Value > 0 ? "Sent: " + bytesSentAboveAverage + " above average \n" : "") +
+                    (bytesReceivedAboveAverage.Value > 0 ? "Received: " + bytesReceivedAboveAverage + " above average" : "");
+
+                builder.AddText("Network Usage Tracker").AddText(toastMessage).Show();
+            }
 
             // .. Console report
             Console.WriteLine(DateTime.Now);
             Console.WriteLine("===================");
-            Console.WriteLine($"Data sent: {bytesSentInfo:F2}");
-            Console.WriteLine($"Data received: {bytesReceivedInfo:F2}");
+            Console.WriteLine($"Data sent: {bytesSent:F2} (Avg: {avgBytesSent})");
+            Console.WriteLine($"Data received: {bytesReceived:F2} (Avg: {avgBytesReceived})");
             Console.WriteLine();
         }
     }

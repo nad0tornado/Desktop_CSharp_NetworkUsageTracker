@@ -10,16 +10,27 @@ namespace NetworkUsageTracker_Tests
             var usageCollector = new MockUsageCollector();
             var usageAnalyzer = new UsageAnalyzer(usageCollector);
 
-            var firstUsageInfo = usageAnalyzer.GetRelativeUsageInfo();
-            Assert.Equal(0, firstUsageInfo.BytesReceived);
-            Assert.Equal(0, firstUsageInfo.BytesSent);
+            var averageUsageInfo = usageAnalyzer.GetRelativeUsageInfo();
+            Assert.Equal(0, averageUsageInfo.BytesReceived);
+            Assert.Equal(0, averageUsageInfo.BytesSent);
 
-            usageCollector.MockSendBytes(100);
-            usageCollector.MockReceiveBytes(100);
+            usageCollector.MockSendBytes(1);
+            usageCollector.MockReceiveBytes(1);
 
-            var secondUsageInfo = usageAnalyzer.GetRelativeUsageInfo();
-            Assert.Equal(100, secondUsageInfo.BytesReceived);
-            Assert.Equal(100, secondUsageInfo.BytesSent);
+            var usageInfo = usageAnalyzer.GetRelativeUsageInfo();
+            Assert.Equal(1, usageInfo.BytesReceived);
+            Assert.Equal(1, usageInfo.BytesSent);
+
+            usageCollector.MockSendBytes(3);
+            usageCollector.MockReceiveBytes(3);
+
+            usageInfo = usageAnalyzer.GetRelativeUsageInfo();
+            Assert.Equal(3, usageInfo.BytesReceived);
+            Assert.Equal(3, usageInfo.BytesSent);
+
+            averageUsageInfo = usageAnalyzer.GetAverageUsageInfo();
+            Assert.Equal(2, averageUsageInfo.BytesReceived);
+            Assert.Equal(2, averageUsageInfo.BytesSent);
         }
     }
 }

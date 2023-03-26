@@ -1,4 +1,6 @@
-﻿namespace NetworkUsageTracker
+﻿using NetworkUsageTracker.Interfaces;
+
+namespace NetworkUsageTracker
 {
     internal interface IUsageAnalyzer
     {
@@ -7,5 +9,6 @@
         /// </summary>
         /// <returns></returns>
         public UsageInfo GetRelativeUsageInfo();
+        public UsageInfo GetAverageUsageInfo();
     }
 }
