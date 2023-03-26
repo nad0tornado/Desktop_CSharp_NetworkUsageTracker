@@ -1,6 +1,6 @@
 # Network Usage Tracker
 
-**Console application built with C#. Displays a Toast Notification under certain conditions or after a set time interval e.g. 30 minutes**
+**Console application built with C#. Displays a Toast Notification under certain conditions or after a set time interval e.g. 30 minutes regarding excessive data usage**
 
 ---
 
