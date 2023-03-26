@@ -2,7 +2,11 @@
 
 ### Stack: C# (.NET Core 6.0)
 
-**Concepts Explored:** Encapsulation, Separation of Concerns, Unit & Integration testing, Dependency Injection 
+**Concepts Explored:** 
+- Encapsulation & Abstraction
+- Separation of Concerns & Single-Responsibility (SOLID)
+- Unit & Integration testing
+- Dependency Injection 
 
 ---
 
