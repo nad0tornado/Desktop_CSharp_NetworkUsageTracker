@@ -3,7 +3,7 @@ using NetworkUsageTracker.Interfaces;
 
 namespace NetworkUsageTracker
 {
-    internal class UsageReporter : IUsageReporter
+    internal class UsageReporter
     {
         private IUsageAnalyzer _usageAnalyzer;
 
@@ -38,11 +38,24 @@ namespace NetworkUsageTracker
             }
 
             // .. Console report
+            Console.Clear();
             Console.WriteLine(DateTime.Now);
             Console.WriteLine("===================");
             Console.WriteLine($"Data sent: {bytesSent:F2} (Avg: {avgBytesSent})");
             Console.WriteLine($"Data received: {bytesReceived:F2} (Avg: {avgBytesReceived})");
-            Console.WriteLine();
+            Console.WriteLine("--");
+            foreach (var processUsageInfo in _usageAnalyzer.AppUsage)
+            {
+                Console.WriteLine(processUsageInfo.Key + ":");
+
+                var processBytesSent = Utilities.ConvertBytes(processUsageInfo.Value.BytesSent);
+                var processBytesReceived = Utilities.ConvertBytes(processUsageInfo.Value.BytesReceived);
+
+                Console.WriteLine(" - " + processBytesSent + " sent");
+                Console.WriteLine(" - " + processBytesReceived + " received");
+            }
+            Console.WriteLine("--");
+            _usageAnalyzer.ClearAppUsage();
         }
     }
 }

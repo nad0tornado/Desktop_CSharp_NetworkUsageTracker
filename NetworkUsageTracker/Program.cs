@@ -1,22 +1,26 @@
-﻿using NetworkUsageTracker.Interfaces;
+﻿using Microsoft.Diagnostics.Tracing.Parsers;
+using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
+using Microsoft.Diagnostics.Tracing.Session;
+using NetworkUsageTracker.Interfaces;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
 
 namespace NetworkUsageTracker
 {
     internal class Program
     {
-        const int mWait = 30;
-        const int sWait = 0;
         const int msWait = 1000; //1800000; // ..30 minutes
-            //mWait > 0 ? mWait * 60 * 1000 : sWait > 0 ? sWait * 1000 : 5000;
-        static DateTime lastRunTime = DateTime.Now - TimeSpan.FromMilliseconds(msWait);
 
-        static IUsageAnalyzer usageAnalyzer = new UsageAnalyzer(new UsageCollector());
+        static readonly IUsageCollector usageCollector = new UsageCollector();
+        static readonly IUsageListener usageListener = new UsageListener();
+        static readonly IUsageAnalyzer usageAnalyzer = new UsageAnalyzer(usageCollector,usageListener);
 
-        static void Main(string[] args)
+        static void Main()
         {
             while (true)
             {
                 Run();
+                Thread.Sleep(msWait);
             }
         }
 
@@ -24,9 +28,6 @@ namespace NetworkUsageTracker
         {
             var usageReporter = new UsageReporter(usageAnalyzer);
             usageReporter.ReportUsage();
-
-            // .. Wait and then run again
-            Thread.Sleep(msWait);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using NetworkUsageTracker.Interfaces;
+﻿using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
+using NetworkUsageTracker.Interfaces;
+using System.Collections.Generic;
 
 namespace NetworkUsageTracker
 {
@@ -6,21 +8,63 @@ namespace NetworkUsageTracker
     {
         private long lastBytesSent = 0, lastBytesReceived = 0;
 
-        private List<long> pastBytesSent = new List<long>();
-        private List<long> pastBytesReceived = new List<long>();
+        private List<long> pastBytesSent = new();
+        private List<long> pastBytesReceived = new();
 
         private IUsageCollector _usageCollector;
+        private IUsageListener _usageListener;
 
-        public UsageAnalyzer(IUsageCollector usageCollector)
-        {
-            _usageCollector = usageCollector;
-            var usageInfo = _usageCollector.GetUsageInfo();
-            lastBytesSent = usageInfo.BytesSent;
-            lastBytesReceived = usageInfo.BytesReceived;
+        private Dictionary<string, UsageInfo> _appUsage = new();
+        public Dictionary<string, UsageInfo> AppUsage { 
+            get => _appUsage.ToDictionary(e => e.Key, e => e.Value); 
+            private set => _appUsage = value; 
         }
+
+        public UsageAnalyzer(IUsageCollector collector, IUsageListener listener)
+        {
+            _usageCollector = collector;
+            _usageListener = listener;
+
+            _usageListener.ReceiveTCP = HandleReceiveTCP;
+            _usageListener.ReceiveUDP = HandleReceiveUDP;
+            _usageListener.SendTCP = HandleSendTCP;
+            _usageListener.SendUDP = HandleSendUDP;
+
+            Task.Run(() => _usageListener.Start());
+        }
+
+        private void HandleSend(string processName, int bytes)
+        {
+            if (!_appUsage.ContainsKey(processName))
+                _appUsage.Add(processName, new UsageInfo());
+
+            var processUsage = _appUsage[processName];
+            processUsage.BytesSent = bytes;
+            _appUsage[processName] = processUsage;
+        }
+
+        private void HandleReceive(string processName, int bytes)
+        {
+            if (!_appUsage.ContainsKey(processName))
+                _appUsage.Add(processName, new UsageInfo());
+
+            var processUsage = _appUsage[processName];
+            processUsage.BytesReceived = bytes;
+            _appUsage[processName] = processUsage;
+        }
+
+        public void HandleReceiveTCP(TcpIpTraceData data) => HandleReceive(data.ProcessName, data.EventDataLength);
+        public void HandleReceiveUDP(UdpIpTraceData data) => HandleReceive(data.ProcessName, data.EventDataLength);
+        public void HandleSendTCP(TcpIpSendTraceData data) => HandleSend(data.ProcessName, data.EventDataLength);
+        public void HandleSendUDP(UdpIpTraceData data) => HandleSend(data.ProcessName, data.EventDataLength);
+
+        public void ClearAppUsage() => _appUsage.Clear();
 
         public UsageInfo GetRelativeUsageInfo()
         {
+            if (_usageCollector == null)
+                throw new NullReferenceException("A UsageCollector is required to get relative usage info");
+
             var usageInfo = _usageCollector.GetUsageInfo();
 
             var newBytesSent = usageInfo.BytesSent - lastBytesSent;

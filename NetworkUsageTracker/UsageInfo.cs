@@ -2,8 +2,8 @@
 {
     internal struct UsageInfo
     {
-        public long BytesSent { get; }
-        public long BytesReceived { get; }
+        public long BytesSent { get; set; }
+        public long BytesReceived { get; set; }
 
         public UsageInfo(long sent, long received)
         {
