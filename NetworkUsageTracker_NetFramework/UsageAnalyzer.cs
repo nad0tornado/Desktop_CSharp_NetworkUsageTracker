@@ -1,6 +1,9 @@
 ﻿using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using NetworkUsageTracker.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System;
 
 namespace NetworkUsageTracker
 {
@@ -8,13 +11,13 @@ namespace NetworkUsageTracker
     {
         private long lastBytesSent = 0, lastBytesReceived = 0;
 
-        private List<long> pastBytesSent = new();
-        private List<long> pastBytesReceived = new();
+        private List<long> pastBytesSent = new List<long>();
+        private List<long> pastBytesReceived = new List<long>();
 
         private IUsageCollector _usageCollector;
         private IUsageListener _usageListener;
 
-        private Dictionary<string, UsageInfo> _appUsage = new();
+        private Dictionary<string, UsageInfo> _appUsage = new Dictionary<string, UsageInfo>();
         public Dictionary<string, UsageInfo> AppUsage { 
             get => _appUsage.ToDictionary(e => e.Key, e => e.Value); 
             private set => _appUsage = value; 

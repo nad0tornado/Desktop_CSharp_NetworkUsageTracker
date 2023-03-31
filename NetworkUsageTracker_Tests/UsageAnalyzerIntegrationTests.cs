@@ -8,7 +8,7 @@ namespace NetworkUsageTracker_Tests
         public void TestUsageAnalyzer()
         {
             var usageCollector = new MockUsageCollector();
-            var usageListener = new MockUsageListener();
+            var usageListener = new UsageListener();
             var usageAnalyzer = new UsageAnalyzer(usageCollector, usageListener);
 
             var averageUsageInfo = usageAnalyzer.GetRelativeUsageInfo();

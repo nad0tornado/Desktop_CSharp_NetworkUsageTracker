@@ -44,7 +44,7 @@ namespace NetworkUsageTracker
             Console.WriteLine($"Data sent: {bytesSent:F2} (Avg: {avgBytesSent})");
             Console.WriteLine($"Data received: {bytesReceived:F2} (Avg: {avgBytesReceived})");
             Console.WriteLine("--");
-            foreach (var processUsageInfo in _usageAnalyzer.AppUsage)
+            foreach (var processUsageInfo in _usageAnalyzer.AppUsage.Where(a => a.Value.BytesReceived > 50))
             {
                 Console.WriteLine(processUsageInfo.Key + ":");
 
